@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
 
-from .mysql_db import MySQLStudentDB
+from .sqlite_db import SQLiteStudentDB
 from .student_service import StudentService, ValidationError
 
 
@@ -23,7 +23,7 @@ def create_app(service=None):
     app.register_blueprint(swaggerui_blueprint, url_prefix=swagger_url)
 
     if service is None:
-        service = StudentService(MySQLStudentDB())
+        service = StudentService(SQLiteStudentDB())
 
     @app.route("/api/students", methods=["GET"])
     def api_list_students():

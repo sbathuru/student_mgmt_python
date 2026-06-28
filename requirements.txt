@@ -1,4 +1,3 @@
 flask
 flask-swagger-ui
 flask-cors
-mysql-connector-python

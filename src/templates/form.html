@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'edit' %}Edit Student{% else %}Add Student{% endif %} — Student Records{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <span class="card-eyebrow">{% if mode == 'edit' %}Record {{ "%03d"|format(student.id|int) }}{% else %}New entry{% endif %}</span>
+      <h2 class="card-title">{% if mode == 'edit' %}Edit student{% else %}Add a student{% endif %}</h2>
+    </div>
+
+    <form method="POST" class="record-form">
+      <div class="field">
+        <label for="name">Full name</label>
+        <input type="text" id="name" name="name" required maxlength="100"
+               value="{{ student.name if student else '' }}" placeholder="e.g. Aarav Sharma" autofocus>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="age" required min="1" max="120"
+                 value="{{ student.age if student else '' }}" placeholder="20">
+        </div>
+
+        <div class="field">
+          <label for="course">Course</label>
+          <input type="text" id="course" name="course" required maxlength="100"
+                 value="{{ student.course if student else '' }}" placeholder="e.g. Computer Science">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required
+               value="{{ student.email if student else '' }}" placeholder="student@example.com">
+      </div>
+
+      <div class="form-actions">
+        <a href="{{ url_for('index') }}" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+          {% if mode == 'edit' %}Save changes{% else %}Add student{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

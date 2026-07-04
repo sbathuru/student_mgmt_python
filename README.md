@@ -1,6 +1,6 @@
 # Student Management System (Python backend)
 
-A Flask-based backend API for student management, now separated from the React frontend. The API is implemented in `src/app.py` and persists student records to a local SQLite database via `src/sqlite_db.py`.
+A Flask-based backend API for student management, now separated from the React frontend. The API is implemented in `src/app.py` and persists student records to a local SQLite database by default via `src/sqlite_db.py`. It can also be switched to Oracle by setting Oracle connection variables in `.env`.
 
 ## Project structure
 
@@ -29,7 +29,7 @@ python3 -m pip install --upgrade pip
 python3 -m pip install -r requirements.txt
 ```
 
-Copy `.env.example` to `.env` if you want to override the default SQLite database location:
+Copy `.env.example` to `.env` if you want to override the default SQLite database location or configure Oracle:
 
 ```bash
 cp .env.example .env
@@ -43,7 +43,15 @@ source .venv/bin/activate
 python3 app.py
 ```
 
-The first run creates a local SQLite database file named `student.db` in the project root.
+The first run creates a local SQLite database file named `student.db` in the project root when Oracle is not configured.
+
+To use Oracle instead, set the following in `.env` before starting the app:
+
+```env
+ORACLE_USER=system
+ORACLE_PASSWORD=your_password
+ORACLE_DSN=localhost/XEPDB1
+```
 
 Then open:
 

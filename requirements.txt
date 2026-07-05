@@ -1,3 +1,5 @@
 flask
 flask-swagger-ui
 flask-cors
+oracledb
+oracledb

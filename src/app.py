@@ -6,17 +6,35 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
 
-from .sqlite_db import SQLiteStudentDB
 from .student_service import StudentService, ValidationError
 
 
-def create_repository():
-    """Create the configured repository implementation."""
-    if os.getenv("ORACLE_USER") and os.getenv("ORACLE_PASSWORD") and os.getenv("ORACLE_DSN"):
-        from .oracle_db import OracleStudentDB
+class LazyService:
+    """Lazily creates the real service once the Oracle repository is available."""
 
-        return OracleStudentDB()
-    return SQLiteStudentDB()
+    def __init__(self, repository_factory):
+        self._repository_factory = repository_factory
+        self._service = None
+
+    def _get_service(self):
+        if self._service is None:
+            self._service = StudentService(self._repository_factory())
+        return self._service
+
+    def __getattr__(self, name):
+        return getattr(self._get_service(), name)
+
+
+def create_repository():
+    """Create the Oracle repository implementation."""
+    if not os.getenv("ORACLE_USER") or not os.getenv("ORACLE_PASSWORD") or not os.getenv("ORACLE_DSN"):
+        raise ValueError(
+            "Oracle configuration is required. Set ORACLE_USER, ORACLE_PASSWORD, and ORACLE_DSN."
+        )
+
+    from .oracle_db import OracleStudentDB
+
+    return OracleStudentDB()
 
 
 def create_app(service=None):
@@ -34,7 +52,7 @@ def create_app(service=None):
     app.register_blueprint(swaggerui_blueprint, url_prefix=swagger_url)
 
     if service is None:
-        service = StudentService(create_repository())
+        service = LazyService(create_repository)
 
     @app.route("/api/students", methods=["GET"])
     def api_list_students():

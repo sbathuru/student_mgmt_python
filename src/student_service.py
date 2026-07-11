@@ -43,14 +43,11 @@ class StudentService:
         return name
 
     @staticmethod
-    def _validate_age(age) -> int:
-        try:
-            age = int(age)
-        except (ValueError, TypeError):
-            raise ValidationError("Age must be a whole number.")
-        if age <= 0 or age > 120:
-            raise ValidationError("Age must be between 1 and 120.")
-        return age
+    def _validate_semester(semester: str) -> str:
+        semester = (semester or "").strip()
+        if not semester:
+            raise ValidationError("Semester cannot be empty.")
+        return semester
 
     @staticmethod
     def _validate_email(email: str) -> str:
@@ -66,18 +63,26 @@ class StudentService:
             raise ValidationError("Course cannot be empty.")
         return course
 
+    @staticmethod
+    def _validate_city(city: str) -> str:
+        city = (city or "").strip()
+        if not city:
+            raise ValidationError("City cannot be empty.")
+        return city
+
     # ---------- CRUD operations ----------
 
-    def add_student(self, name: str, age, email: str, course: str) -> Student:
+    def add_student(self, name: str, semester, email: str, course: str, city: str) -> Student:
         name = self._validate_name(name)
-        age = self._validate_age(age)
+        semester = self._validate_semester(semester)
         email = self._validate_email(email)
         course = self._validate_course(course)
+        city = self._validate_city(city)
 
         if self.repository.exists_email(email):
             raise ValidationError(f"A student with email '{email}' already exists.")
 
-        student = Student(id=None, name=name, age=age, email=email, course=course)
+        student = Student(id=None, name=name, semester=semester, email=email, course=course, city=city)
         return self.repository.add(student)
 
     def list_students(self) -> List[Student]:
@@ -90,9 +95,10 @@ class StudentService:
         self,
         student_id: int,
         name: Optional[str] = None,
-        age=None,
+        semester=None,
         email: Optional[str] = None,
         course: Optional[str] = None,
+        city: Optional[str] = None,
     ) -> Student:
         existing = self.repository.get_by_id(student_id)
         if existing is None:
@@ -101,8 +107,8 @@ class StudentService:
         fields = {}
         if name is not None and name.strip() != "":
             fields["name"] = self._validate_name(name)
-        if age is not None and str(age).strip() != "":
-            fields["age"] = self._validate_age(age)
+        if semester is not None and str(semester).strip() != "":
+            fields["semester"] = self._validate_semester(semester)
         if email is not None and email.strip() != "":
             email_clean = self._validate_email(email)
             if self.repository.exists_email(email_clean, exclude_id=student_id):
@@ -110,6 +116,8 @@ class StudentService:
             fields["email"] = email_clean
         if course is not None and course.strip() != "":
             fields["course"] = self._validate_course(course)
+        if city is not None and city.strip() != "":
+            fields["city"] = self._validate_city(city)
 
         if not fields:
             raise ValidationError("No valid fields provided to update.")

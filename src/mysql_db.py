@@ -35,9 +35,10 @@ class MySQLStudentDB(StudentRepository):
                     CREATE TABLE IF NOT EXISTS students (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         name VARCHAR(100) NOT NULL,
-                        age INT NOT NULL,
+                        semester VARCHAR(50) NOT NULL,
                         email VARCHAR(150) NOT NULL UNIQUE,
-                        course VARCHAR(100) NOT NULL
+                        course VARCHAR(100) NOT NULL,
+                        city VARCHAR(100) NOT NULL
                     )
                     """
                 )
@@ -51,8 +52,8 @@ class MySQLStudentDB(StudentRepository):
             try:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO students (name, age, email, course) VALUES (%s, %s, %s, %s)",
-                        (student.name, student.age, student.email, student.course),
+                        "INSERT INTO students (name, semester, email, course, city) VALUES (%s, %s, %s, %s, %s)",
+                        (student.name, student.semester, student.email, student.course, student.city),
                     )
                     student.id = cursor.lastrowid
                 conn.commit()
@@ -65,24 +66,24 @@ class MySQLStudentDB(StudentRepository):
             conn = self._connect()
             try:
                 with conn.cursor(dictionary=True) as cursor:
-                    cursor.execute("SELECT id, name, age, email, course FROM students ORDER BY id")
+                    cursor.execute("SELECT id, name, semester, email, course, city FROM students ORDER BY id")
                     rows = cursor.fetchall()
             finally:
                 conn.close()
-            return [Student(id=row["id"], name=row["name"], age=row["age"], email=row["email"], course=row["course"]) for row in rows]
+            return [Student(id=row["id"], name=row["name"], semester=row["semester"], email=row["email"], course=row["course"], city=row["city"]) for row in rows]
 
     def get_by_id(self, student_id: int) -> Optional[Student]:
         with self._lock:
             conn = self._connect()
             try:
                 with conn.cursor(dictionary=True) as cursor:
-                    cursor.execute("SELECT id, name, age, email, course FROM students WHERE id = %s", (student_id,))
+                    cursor.execute("SELECT id, name, semester, email, course, city FROM students WHERE id = %s", (student_id,))
                     row = cursor.fetchone()
             finally:
                 conn.close()
             if row is None:
                 return None
-            return Student(id=row["id"], name=row["name"], age=row["age"], email=row["email"], course=row["course"])
+            return Student(id=row["id"], name=row["name"], semester=row["semester"], email=row["email"], course=row["course"], city=row["city"])
 
     def update(self, student_id: int, **fields) -> Optional[Student]:
         with self._lock:

@@ -94,9 +94,10 @@ def create_app(service=None):
         try:
             student = service.add_student(
                 name=payload.get("name", ""),
-                age=payload.get("age", ""),
+                semester=payload.get("semester", ""),
                 email=payload.get("email", ""),
                 course=payload.get("course", ""),
+                city=payload.get("city", ""),
             )
             return jsonify(student.to_dict()), 201
         except ValidationError as e:
@@ -115,9 +116,10 @@ def create_app(service=None):
             student = service.update_student(
                 student_id,
                 name=payload.get("name"),
-                age=payload.get("age"),
+                semester=payload.get("semester"),
                 email=payload.get("email"),
                 course=payload.get("course"),
+                city=payload.get("city"),
             )
             return jsonify(student.to_dict()), 200
         except ValidationError as e:

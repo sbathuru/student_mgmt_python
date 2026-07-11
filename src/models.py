@@ -18,9 +18,10 @@ class Student:
 
     id: Optional[int]      # Primary key. None until assigned by the DB layer.
     name: str
-    age: int
+    semester: str
     email: str
     course: str
+    city: str
 
     def to_dict(self) -> dict:
         """Convert the Student object to a dictionary (useful for display/serialization)."""

@@ -30,9 +30,10 @@ class SQLiteStudentDB(StudentRepository):
                     CREATE TABLE IF NOT EXISTS students (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT NOT NULL,
-                        age INTEGER NOT NULL,
+                        semester TEXT NOT NULL,
                         email TEXT NOT NULL UNIQUE,
-                        course TEXT NOT NULL
+                        course TEXT NOT NULL,
+                        city TEXT NOT NULL
                     )
                     """
                 )
@@ -45,8 +46,8 @@ class SQLiteStudentDB(StudentRepository):
             try:
                 with conn:
                     cursor = conn.execute(
-                        "INSERT INTO students (name, age, email, course) VALUES (?, ?, ?, ?)",
-                        (student.name, student.age, student.email, student.course),
+                        "INSERT INTO students (name, semester, email, course, city) VALUES (?, ?, ?, ?, ?)",
+                        (student.name, student.semester, student.email, student.course, student.city),
                     )
                     student.id = cursor.lastrowid
             finally:
@@ -58,12 +59,12 @@ class SQLiteStudentDB(StudentRepository):
             conn = self._connect()
             try:
                 rows = conn.execute(
-                    "SELECT id, name, age, email, course FROM students ORDER BY id"
+                    "SELECT id, name, semester, email, course, city FROM students ORDER BY id"
                 ).fetchall()
             finally:
                 conn.close()
             return [
-                Student(id=row["id"], name=row["name"], age=row["age"], email=row["email"], course=row["course"])
+                Student(id=row["id"], name=row["name"], semester=row["semester"], email=row["email"], course=row["course"], city=row["city"])
                 for row in rows
             ]
 
@@ -72,14 +73,14 @@ class SQLiteStudentDB(StudentRepository):
             conn = self._connect()
             try:
                 row = conn.execute(
-                    "SELECT id, name, age, email, course FROM students WHERE id = ?",
+                    "SELECT id, name, semester, email, course, city FROM students WHERE id = ?",
                     (student_id,),
                 ).fetchone()
             finally:
                 conn.close()
             if row is None:
                 return None
-            return Student(id=row["id"], name=row["name"], age=row["age"], email=row["email"], course=row["course"])
+            return Student(id=row["id"], name=row["name"], semester=row["semester"], email=row["email"], course=row["course"], city=row["city"])
 
     def update(self, student_id: int, **fields) -> Optional[Student]:
         with self._lock:

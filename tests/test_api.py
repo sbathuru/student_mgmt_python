@@ -6,7 +6,7 @@ from src.models import Student
 
 class FakeService:
     def __init__(self):
-        self.students = [Student(id=1, name="Ava", age=20, email="ava@example.com", course="CS")]
+        self.students = [Student(id=1, name="Ava", semester="3rd", email="ava@example.com", course="CS", city="Delhi")]
 
     def list_students(self):
         return self.students
@@ -14,23 +14,25 @@ class FakeService:
     def get_student(self, student_id):
         return next((s for s in self.students if s.id == student_id), None)
 
-    def add_student(self, name, age, email, course):
-        student = Student(id=len(self.students) + 1, name=name, age=int(age), email=email, course=course)
+    def add_student(self, name, semester, email, course, city):
+        student = Student(id=len(self.students) + 1, name=name, semester=semester, email=email, course=course, city=city)
         self.students.append(student)
         return student
 
-    def update_student(self, student_id, name=None, age=None, email=None, course=None):
+    def update_student(self, student_id, name=None, semester=None, email=None, course=None, city=None):
         student = self.get_student(student_id)
         if student is None:
             raise ValueError("not found")
         if name is not None:
             student.name = name
-        if age is not None:
-            student.age = int(age)
+        if semester is not None:
+            student.semester = semester
         if email is not None:
             student.email = email
         if course is not None:
             student.course = course
+        if city is not None:
+            student.city = city
         return student
 
     def delete_student(self, student_id):
@@ -56,9 +58,10 @@ class StudentApiTests(unittest.TestCase):
             "/api/students",
             json={
                 "name": "API Test Student",
-                "age": 23,
+                "semester": "5th",
                 "email": "api-test@example.com",
                 "course": "Physics",
+                "city": "Mumbai",
             },
         )
         self.assertEqual(response.status_code, 201)

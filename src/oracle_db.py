@@ -41,9 +41,10 @@ class OracleStudentDB(StudentRepository):
                       EXECUTE IMMEDIATE 'CREATE TABLE students (
                         id NUMBER PRIMARY KEY,
                         name VARCHAR2(100) NOT NULL,
-                        age NUMBER NOT NULL,
+                        semester VARCHAR2(50) NOT NULL,
                         email VARCHAR2(255) NOT NULL UNIQUE,
-                        course VARCHAR2(100) NOT NULL
+                        course VARCHAR2(100) NOT NULL,
+                        city VARCHAR2(100) NOT NULL
                       )';
                     EXCEPTION
                       WHEN OTHERS THEN
@@ -69,7 +70,7 @@ class OracleStudentDB(StudentRepository):
             conn.close()
 
     def _row_to_student(self, row) -> Student:
-        return Student(id=row[0], name=row[1], age=row[2], email=row[3], course=row[4])
+        return Student(id=row[0], name=row[1], semester=row[2], email=row[3], course=row[4], city=row[5])
 
     def add(self, student: Student) -> Student:
         with self._lock:
@@ -80,8 +81,8 @@ class OracleStudentDB(StudentRepository):
                     cursor.execute("SELECT students_seq.NEXTVAL FROM dual")
                     student.id = cursor.fetchone()[0]
                     cursor.execute(
-                        "INSERT INTO students (id, name, age, email, course) VALUES (:1, :2, :3, :4, :5)",
-                        (student.id, student.name, student.age, student.email, student.course),
+                        "INSERT INTO students (id, name, semester, email, course, city) VALUES (:1, :2, :3, :4, :5, :6)",
+                        (student.id, student.name, student.semester, student.email, student.course, student.city),
                     )
             finally:
                 conn.close()
@@ -92,7 +93,7 @@ class OracleStudentDB(StudentRepository):
             conn = self._connect()
             try:
                 cursor = conn.cursor()
-                cursor.execute("SELECT id, name, age, email, course FROM students ORDER BY id")
+                cursor.execute("SELECT id, name, semester, email, course, city FROM students ORDER BY id")
                 rows = cursor.fetchall()
             finally:
                 conn.close()
@@ -104,7 +105,7 @@ class OracleStudentDB(StudentRepository):
             try:
                 cursor = conn.cursor()
                 cursor.execute(
-                    "SELECT id, name, age, email, course FROM students WHERE id = :1",
+                    "SELECT id, name, semester, email, course, city FROM students WHERE id = :1",
                     (student_id,),
                 )
                 row = cursor.fetchone()

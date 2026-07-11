@@ -15,9 +15,10 @@
     <tr>
       <th class="col-id">ID</th>
       <th class="col-name">Name</th>
-      <th class="col-age">Age</th>
+      <th class="col-semester">Semester</th>
       <th class="col-email">Email</th>
       <th class="col-course">Course</th>
+      <th class="col-city">City</th>
       <th class="col-actions"></th>
     </tr>
   </thead>
@@ -26,9 +27,10 @@
     <tr>
       <td class="col-id">{{ "%03d"|format(s.id) }}</td>
       <td class="col-name">{{ s.name }}</td>
-      <td class="col-age">{{ s.age }}</td>
+      <td class="col-semester">{{ s.semester }}</td>
       <td class="col-email">{{ s.email }}</td>
       <td class="col-course"><span class="course-tag">{{ s.course }}</span></td>
+      <td class="col-city">{{ s.city }}</td>
       <td class="col-actions">
         <a href="{{ url_for('edit_student', student_id=s.id) }}" class="action-link">Edit</a>
         <form action="{{ url_for('delete_student', student_id=s.id) }}" method="POST" class="inline-form">
